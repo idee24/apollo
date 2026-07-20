@@ -1,0 +1,46 @@
+[project]
+name = "apollo-engine"
+version = "0.0.0"
+description = "Conditional lethality estimator for violent-incident scenarios (GTD). Retrospective, probabilistic decision-support."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary — see STRATEGY.md; underlying data is separately licensed and non-redistributable" }
+authors = [{ name = "Idhanosi Yerimah" }]
+
+# Core engine deps kept lean so Phase 0/1 install fast.
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "joblib>=1.4",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+models = ["lightgbm>=4.3"]          # gradient-boosted challenger to the RF baseline
+api = ["fastapi>=0.111", "uvicorn[standard]>=0.30", "pydantic>=2.7"]
+fairness = ["fairlearn>=0.10"]
+dev = ["pytest>=8.2", "ruff>=0.5", "httpx>=0.27"]  # httpx powers fastapi TestClient
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["engine", "training", "api"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["python"]  # draft-1 reference code — not maintained, not linted
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    # third-party deprecation noise, not from Apollo code
+    "ignore:Using `httpx` with `starlette.testclient`:",
+    "ignore:Setting the shape on a NumPy array:DeprecationWarning",
+]

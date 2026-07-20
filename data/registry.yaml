@@ -1,0 +1,179 @@
+# Apollo data registry — the single source of truth for every dataset.
+# Rules:
+#   - No dataset is used until it has an entry here with verified terms.
+#   - `training_use: blocked` means the source MUST NOT be used to train/test/develop any model.
+#   - Populate `sha256` and `local_path` only after obtaining the file; raw files are gitignored.
+#   - Re-verify `terms_url` and `license` at every production refresh — terms change.
+#
+# Verification legend:
+#   verified: <date>  = terms checked against the provider on that date
+#   assumed           = generally-known licence, NOT independently checked this session — verify at ingestion
+
+datasets:
+
+  gtd:
+    name: Global Terrorism Database
+    provider: START / University of Maryland
+    priority: P0
+    role: Canonical terrorism incident history and lethality labels (Model A primary training set)
+    url: https://www.start.umd.edu/download-global-terrorism-database
+    terms_url: https://www.start.umd.edu/gtd/terms-of-use/
+    license: Non-commercial research/analysis only; University of Maryland retains all rights.
+    verification: "verified: 2026-07-20"
+    permitted_uses:
+      - Non-commercial research and analysis
+      - Training predictive models for non-commercial research
+    restrictions:
+      - No redistribution or republication of the RAW data, commercial or non-commercial.
+      - Explicitly no republication of GTD data on any publicly-available website.
+      - Commercial use / commercial products require a SEPARATE agreement with UMD.
+      - Access is gated (2025): obtain via the GTD download request form.
+    training_use: allowed        # modelling OK; publishing raw data is not
+    deployment_notes: >
+      Serve only derived model outputs. Keep raw incident records and free-text
+      narratives (summary, weapdetail, scite*) server-side and access-controlled.
+      A public or commercial deployment requires the UMD agreement first.
+    time_coverage: "1970-2020 (main file) + 2021-01..2021-06 (separate file); 1993 missing"
+    version: TBD                 # record exact release once downloaded
+    local_path: TBD              # e.g. data/raw/gtd/gtd_1970_2020.csv
+    sha256: TBD
+    refresh_policy: Re-check availability & terms each production refresh; access may change.
+
+  ucdp_ged:
+    name: UCDP Georeferenced Event Dataset
+    provider: Uppsala Conflict Data Program
+    priority: P1
+    role: Independent organized-violence history; external validation; Model B regional-month lag features
+    url: https://ucdp.uu.se/downloads/
+    terms_url: https://ucdp.uu.se/downloads/
+    license: Open academic (CC BY-style) — VERIFY exact terms at download.
+    verification: "assumed"
+    permitted_uses:
+      - External validation of GTD-trained models
+      - Conflict-environment / lagged intensity features (Model B)
+    restrictions:
+      - UCDP "organized violence" != GTD "terrorism": keep source-specific labels, do not naively append.
+    training_use: allowed
+    time_coverage: "through 2025 (2026 release); monthly candidate events with limited lag"
+    version: TBD
+    local_path: TBD
+    sha256: TBD
+    refresh_policy: Monthly candidate-events product available; snapshot with vintage date.
+
+  wdi:
+    name: World Development Indicators
+    provider: World Bank
+    priority: P1
+    role: Country-year population, income, urbanisation, state-capacity proxies (lagged context)
+    url: https://data.worldbank.org/
+    terms_url: https://datahelpdesk.worldbank.org/knowledgebase/articles/898599
+    license: Open (World Bank open data) — VERIFY at ingestion.
+    verification: "assumed"
+    permitted_uses: [Lagged country-year context features]
+    restrictions:
+      - Use a small PREREGISTERED indicator set; freeze before final evaluation (no test-set fishing).
+      - Always lag values by >=1 year; use real/per-capita measures.
+    training_use: allowed
+    time_coverage: country-year, stable API
+    version: TBD
+    refresh_policy: Query via API; snapshot the exact indicator set + vintage.
+
+  vdem:
+    name: V-Dem Country-Year Core
+    provider: Varieties of Democracy Institute
+    priority: P1
+    role: Governance/democracy/civil-liberties context (lagged); fairness & robustness audits
+    url: https://v-dem.net/data/the-v-dem-dataset/
+    terms_url: https://v-dem.net/data/the-v-dem-dataset/
+    license: Academic use — VERIFY at ingestion.
+    verification: "assumed"
+    permitted_uses: [Lagged context; regime-change interactions; subgroup audits]
+    restrictions:
+      - Use the Core file, not the full hundreds-variable release, for v1.
+      - Predictive, NOT causal — do not claim democracy scores cause incidents.
+      - Retain uncertainty intervals for sensitivity analysis.
+    training_use: allowed
+    version: "v16 (verify current)"
+    refresh_policy: Annual releases.
+
+  geonames:
+    name: GeoNames
+    provider: GeoNames
+    priority: P1
+    role: Gazetteer — stable place IDs, coordinates (geography spine)
+    url: https://download.geonames.org/export/dump/
+    terms_url: https://www.geonames.org/
+    license: "CC BY (attribution) — VERIFY at ingestion."
+    verification: "assumed"
+    permitted_uses: [Canonical geography dimension; joins]
+    training_use: allowed        # infrastructure, not labels
+    version: TBD
+
+  natural_earth:
+    name: Natural Earth
+    provider: Natural Earth
+    priority: P1
+    role: Public-domain boundary/map layers for admin joins
+    url: https://www.naturalearthdata.com/
+    terms_url: https://www.naturalearthdata.com/about/terms-of-use/
+    license: Public domain.
+    verification: "assumed"
+    permitted_uses: [Boundary joins; historical border handling]
+    training_use: allowed        # infrastructure, not labels
+    version: TBD
+
+  worldpop:
+    name: WorldPop
+    provider: WorldPop
+    priority: P2
+    role: High-resolution gridded population — local exposure features
+    url: https://www.portal.worldpop.org/
+    terms_url: https://www.worldpop.org/
+    license: "Open (CC BY-style) — VERIFY at ingestion."
+    verification: "assumed"
+    permitted_uses: [Spatial exposure features around coordinates]
+    restrictions:
+      - Add only AFTER the leakage-free GTD baseline works (raster extraction adds complexity).
+      - Use the closest population surface not later than the incident/forecast date.
+    training_use: allowed
+    version: TBD
+
+  acled:
+    name: ACLED
+    provider: Armed Conflict Location & Event Data Project
+    priority: P3
+    role: Near-real-time political violence — DESIRABLE for monitoring, but see restrictions
+    url: https://acleddata.com/data/
+    terms_url: https://acleddata.com/eula
+    license: Non-commercial license (registration required); commercial needs a corporate license.
+    verification: "verified: 2026-07-20"
+    permitted_uses:
+      - Human-facing monitoring/context under non-commercial terms (NOT model training)
+    restrictions:
+      - "EULA S7.1: shall not use ACLED Content to train, test, develop, or improve any"
+      - "machine learning model, LLM, or AI system."
+      - Outputs must be transformative and not reverse-engineerable to ACLED content.
+      - Commercial entities need a corporate license.
+    training_use: blocked        # <-- do NOT train on ACLED without explicit written permission
+    deployment_notes: >
+      Reclassified from the draft-2 dataset doc: ACLED is EXCLUDED from all model
+      training pending explicit written permission from ACLED. Use UCDP GED for
+      conflict context instead.
+    version: n/a
+
+  gdelt:
+    name: GDELT Events / GKG
+    provider: GDELT Project
+    priority: P3
+    role: Media volume/tone/event signals — experimental nowcasting only
+    url: https://www.gdeltproject.org/data.html
+    terms_url: https://www.gdeltproject.org/about.html
+    license: "Open — VERIFY at ingestion."
+    verification: "assumed"
+    permitted_uses: [Lagged media signals for Model B ONLY]
+    restrictions:
+      - NOT ground-truth terrorism labels; never a Model A training example.
+      - Severe look-ahead leakage risk — restrict every record by publication timestamp.
+      - Terabyte-scale; query constrained subsets, do not bulk-download.
+    training_use: deprioritised  # cut from v1/v2 roadmap; revisit only after Models A & B validated
+    version: n/a
