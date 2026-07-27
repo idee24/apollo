@@ -59,11 +59,22 @@ class ForecastPoint(BaseModel):
     features: dict[str, int | float]
 
 
+class ForecastDistribution(BaseModel):
+    """Spread across evaluated plausible scenarios, not a confidence interval."""
+
+    p05: float
+    p25: float
+    median: float
+    p75: float
+    p95: float
+
+
 class ForecastResponse(BaseModel):
     year: int
     location: str
     probability: float
-    distribution: dict[str, float]
+    distribution: ForecastDistribution
+    distribution_description: str
     scenarios_evaluated: int
     positive_points: list[ForecastPoint]
     target: str

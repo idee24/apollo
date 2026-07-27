@@ -31,7 +31,18 @@ def _resolve_location(bundle: dict, location: str) -> dict:
     catalog = bundle.get("location_catalog", {})
     key = normalize_location(location)
     if key in catalog:
-        return catalog[key]
+        candidates = catalog[key]
+        # Compatibility with artifacts produced by the first forecast prototype.
+        if isinstance(candidates, dict):
+            return candidates
+        if len(candidates) == 1:
+            return candidates[0]
+        labels = ", ".join(
+            f"{item['label']} (country:{item.get('country', '?')})" for item in candidates
+        )
+        raise ValueError(
+            f"Ambiguous location {location!r}: {labels}. Use 'country:<GTD code>'."
+        )
     # Stable machine-readable fallbacks are useful when a licensed artifact was
     # trained without text location columns.
     match = re.fullmatch(r"(country|region)\s+(\d+)", key)
@@ -97,6 +108,9 @@ def forecast(bundle: dict, year: int, location: str) -> dict:
             "median": round(float(q50), 4), "p75": round(float(q75), 4),
             "p95": round(float(q95), 4),
         },
+        "distribution_description": (
+            "Percentiles across plausible incident scenarios; not a confidence interval."
+        ),
         "scenarios_evaluated": len(X),
         "positive_points": positive_points,
         "target": (

@@ -79,8 +79,10 @@ def train_and_evaluate() -> dict:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     MODELS_DIR.mkdir(exist_ok=True)
     artifact = MODELS_DIR / f"model_A_{stamp}.joblib"
-    forecast_reference = Xtr.sample(min(10_000, len(Xtr)), random_state=42)
-    location_catalog = _build_location_catalog(df, forecast_reference.index)
+    forecast_reference = _build_forecast_reference(Xtr)
+    # Build aliases from the complete training partition, not the bounded reference
+    # sample. Otherwise a valid but uncommon place can disappear by random chance.
+    location_catalog = _build_location_catalog(df, Xtr.index)
     joblib.dump({
         "model": model,
         "numeric": numeric,
@@ -111,14 +113,43 @@ def _normalise_location(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
 
 
-def _build_location_catalog(df, indices) -> dict[str, dict]:
+def _build_forecast_reference(X, limit: int = 10_000):
+    """Bound artifact growth while retaining support for less common countries."""
+    if len(X) <= limit:
+        return X.copy()
+    if "country" not in X:
+        return X.sample(limit, random_state=42)
+
+    # Reserve up to 25 examples per country so the inference service can use a
+    # genuinely local nuisance-feature distribution instead of a global fallback.
+    reserved_indices = []
+    for _, group in X.groupby("country", dropna=False):
+        reserved_indices.extend(
+            group.sample(min(25, len(group)), random_state=42).index.tolist()
+        )
+    reserved = X.loc[reserved_indices]
+    remaining_slots = max(0, limit - len(reserved))
+    remainder = X.drop(index=reserved.index)
+    if remaining_slots:
+        extra = remainder.sample(min(remaining_slots, len(remainder)), random_state=42)
+        reserved = X.loc[reserved.index.tolist() + extra.index.tolist()]
+    return reserved.iloc[:limit].sort_index()
+
+
+def _build_location_catalog(df, indices) -> dict[str, list[dict]]:
     """Build place aliases without shipping any raw incident or narrative text."""
     available = df.loc[df.index.intersection(indices)]
-    catalog: dict[str, dict] = {}
-    for text_col in ("country_txt", "provstate", "city"):
+    catalog: dict[str, list[dict]] = {}
+    # City names are intentionally excluded: names such as Springfield are highly
+    # ambiguous and the current feature contract has no city identifier.
+    for text_col in ("country_txt", "provstate"):
         if text_col not in available:
             continue
-        for name, group in available.dropna(subset=[text_col]).groupby(text_col):
+        grouping = [text_col]
+        if "country" in available:
+            grouping.append("country")
+        for group_key, group in available.dropna(subset=[text_col]).groupby(grouping):
+            name = group_key[0] if isinstance(group_key, tuple) else group_key
             key = _normalise_location(str(name))
             if not key or len(group) < 2:
                 continue
@@ -129,8 +160,13 @@ def _build_location_catalog(df, indices) -> dict[str, dict]:
             for coord in ("latitude", "longitude"):
                 if coord in group and group[coord].notna().any():
                     entry[coord] = float(group[coord].median())
-            # Prefer the more specific alias when duplicate names occur.
-            catalog[key] = entry
+            candidates = catalog.setdefault(key, [])
+            signature = (entry.get("country"), entry.get("region"))
+            if not any(
+                (candidate.get("country"), candidate.get("region")) == signature
+                for candidate in candidates
+            ):
+                candidates.append(entry)
     return catalog
 
 

@@ -120,10 +120,13 @@ Auth (`APOLLO_API_KEY`) and rate limiting (`APOLLO_RATE_LIMIT_PER_MIN`) are opt-
 
 **Location/year forecast (`/v1/forecast`).** This is the streamlined prediction
 interface: the request contains only `year` and `location`. During training Apollo
-stores a bounded, leakage-safe reference population plus a derived place-name index.
+stores a bounded, geographically stratified, leakage-safe reference population plus
+a derived country/province place-name index. Ambiguous names are rejected instead
+of being silently mapped to the wrong geography.
 At inference it replaces the requested time and geography on each relevant reference
 row, varies all other characteristics across that empirical population, scores every
-combination, and returns the mean, quantiles, and five highest-probability plausible
+combination, and returns the mean, scenario-spread quantiles (not a confidence
+interval), and five highest-probability plausible
 points. For example: `{"year": 2050, "location": "Alaska"}`. Place names must occur
 in the training data; `country:<code>` and `region:<code>` are stable fallbacks.
 

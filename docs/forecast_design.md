@@ -23,11 +23,14 @@ The maintained implementation separates responsibilities:
 ## Forecast semantics
 
 The forecast accepts exactly a year and location. Training saves a reproducible
-sample of up to 10,000 leakage-safe feature rows and a derived place-name catalog.
+geographically stratified sample of up to 10,000 leakage-safe feature rows and a
+derived country/province place-name catalog. The catalog is built from the complete
+training partition so uncommon locations are not randomly dropped; ambiguous names
+are rejected rather than silently assigned to the wrong geography.
 Inference selects the relevant geographic population, overwrites only time and
 location, and scores the remaining empirical feature combinations. This is
 Monte-Carlo-style empirical marginalisation rather than single-value imputation.
-The response reports the mean prediction, distribution quantiles, sample size,
+The response reports the mean prediction, scenario-spread quantiles, sample size,
 and the five highest-probability evaluated combinations for inspection.
 
 This architecture removes the need for a caller to invent attack, weapon, target,

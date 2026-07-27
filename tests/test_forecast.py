@@ -5,7 +5,7 @@ import pytest
 
 from api.forecast import forecast
 from training.features import build_feature_matrix
-from training.train import build_pipeline
+from training.train import _build_forecast_reference, _build_location_catalog, build_pipeline
 
 
 @pytest.fixture
@@ -51,3 +51,36 @@ def test_forecast_varies_nuisance_features(forecast_bundle):
 def test_forecast_rejects_unknown_location(forecast_bundle):
     with pytest.raises(ValueError, match="Unknown location"):
         forecast(forecast_bundle, 2050, "Atlantis")
+
+
+def test_forecast_rejects_ambiguous_place_name(forecast_bundle):
+    forecast_bundle["location_catalog"]["georgia"] = [
+        {"label": "Georgia", "country": 74, "region": 7},
+        {"label": "Georgia", "country": 217, "region": 1},
+    ]
+    with pytest.raises(ValueError, match="Ambiguous location"):
+        forecast(forecast_bundle, 2050, "Georgia")
+
+
+def test_reference_sample_preserves_rare_geographies():
+    frame = pd.DataFrame({
+        "country": [1] * 100 + [2] * 2,
+        "attacktype1": range(102),
+    })
+    sampled = _build_forecast_reference(frame, limit=27)
+    assert len(sampled) == 27
+    assert set(sampled["country"]) == {1, 2}
+
+
+def test_location_catalog_uses_all_training_rows_and_tracks_ambiguity():
+    frame = pd.DataFrame({
+        "country_txt": ["One", "One", "Two", "Two"],
+        "provstate": ["Shared", "Shared", "Shared", "Shared"],
+        "country": [1, 1, 2, 2],
+        "region": [3, 3, 4, 4],
+        "latitude": [1.0, 1.2, 2.0, 2.2],
+        "longitude": [3.0, 3.2, 4.0, 4.2],
+    })
+    catalog = _build_location_catalog(frame, frame.index)
+    assert len(catalog["shared"]) == 2
+    assert catalog["one"][0]["country"] == 1
