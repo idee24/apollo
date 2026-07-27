@@ -21,3 +21,10 @@ GTD_ENCODING = "utf-8"
 TRAIN_END_YEAR = 2015   # train: iyear <= 2015
 VAL_END_YEAR = 2018     # val:   2016..2018
 # test: iyear >= 2019
+
+# Phase 3 — responsible-AI audit (STRATEGY.md §9, §10).
+# Fields treated as sensitive: audited per-subgroup AND ablated to publish the
+# accuracy/fairness trade-off of using them at all.
+SENSITIVE_FIELDS = ["country", "region", "natlty1"]
+# No subgroup metric is reported below this many test rows (STRATEGY.md §10).
+MIN_GROUP_SIZE = 100

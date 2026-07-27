@@ -1,0 +1,907 @@
+{
+  "generated_utc": "2026-07-27T03:35:40+00:00",
+  "gtd_version": "globalterrorismdb_0522dist (May 2022 release, 1970-2020) + globalterrorismdb_2021Jan-June_1222dist (Dec 2022, 2021 H1); combined into one pinned UTF-8 CSV covering 1970-2021 (214,666 rows).\n",
+  "test_split": {
+    "n": 20253,
+    "positive_rate": 0.5895
+  },
+  "overall_metrics": {
+    "n": 20253,
+    "positive_rate": 0.5895,
+    "accuracy": 0.7505,
+    "f1": 0.8204,
+    "brier": 0.1692,
+    "roc_auc": 0.84,
+    "pr_auc": 0.8557
+  },
+  "reliability_curve": [
+    {
+      "bin": "[0.0,0.1)",
+      "n": 889,
+      "mean_pred": 0.0491,
+      "frac_positive": 0.0022
+    },
+    {
+      "bin": "[0.1,0.2)",
+      "n": 350,
+      "mean_pred": 0.1418,
+      "frac_positive": 0.0057
+    },
+    {
+      "bin": "[0.2,0.3)",
+      "n": 452,
+      "mean_pred": 0.2548,
+      "frac_positive": 0.0442
+    },
+    {
+      "bin": "[0.3,0.4)",
+      "n": 862,
+      "mean_pred": 0.3555,
+      "frac_positive": 0.0835
+    },
+    {
+      "bin": "[0.4,0.5)",
+      "n": 1497,
+      "mean_pred": 0.4554,
+      "frac_positive": 0.1997
+    },
+    {
+      "bin": "[0.5,0.6)",
+      "n": 1982,
+      "mean_pred": 0.552,
+      "frac_positive": 0.388
+    },
+    {
+      "bin": "[0.6,0.7)",
+      "n": 2905,
+      "mean_pred": 0.6567,
+      "frac_positive": 0.5129
+    },
+    {
+      "bin": "[0.7,0.8)",
+      "n": 4988,
+      "mean_pred": 0.7619,
+      "frac_positive": 0.754
+    },
+    {
+      "bin": "[0.8,0.9)",
+      "n": 6058,
+      "mean_pred": 0.8446,
+      "frac_positive": 0.8706
+    },
+    {
+      "bin": "[0.9,1.0)",
+      "n": 270,
+      "mean_pred": 0.9111,
+      "frac_positive": 0.9259
+    }
+  ],
+  "subgroups": {
+    "region": {
+      "min_size": 100,
+      "n_groups_reported": 8,
+      "suppressed": {
+        "n_groups": 4,
+        "n_rows": 110
+      },
+      "disparities": {
+        "tpr": {
+          "max": {
+            "group": "South Asia",
+            "value": 0.9788
+          },
+          "min": {
+            "group": "Western Europe",
+            "value": 0.4737
+          },
+          "range": 0.5051
+        },
+        "fpr": {
+          "max": {
+            "group": "Middle East & North Africa",
+            "value": 0.7595
+          },
+          "min": {
+            "group": "Western Europe",
+            "value": 0.0238
+          },
+          "range": 0.7357
+        },
+        "roc_auc": {
+          "max": {
+            "group": "Western Europe",
+            "value": 0.9545
+          },
+          "min": {
+            "group": "Middle East & North Africa",
+            "value": 0.7487
+          },
+          "range": 0.2058
+        },
+        "worst_calibration_gap": {
+          "group": "Middle East & North Africa",
+          "calibration_gap": 0.2175
+        }
+      },
+      "groups": {
+        "Eastern Europe": {
+          "n": 120,
+          "positive_rate": 0.2833,
+          "selection_rate": 0.2667,
+          "tpr": 0.5294,
+          "fpr": 0.1628,
+          "brier": 0.1508,
+          "calibration_gap": 0.0753,
+          "roc_auc": 0.854
+        },
+        "Middle East & North Africa": {
+          "n": 4656,
+          "positive_rate": 0.4454,
+          "selection_rate": 0.8486,
+          "tpr": 0.9595,
+          "fpr": 0.7595,
+          "brier": 0.2543,
+          "calibration_gap": 0.2175,
+          "roc_auc": 0.7487
+        },
+        "North America": {
+          "n": 297,
+          "positive_rate": 0.2391,
+          "selection_rate": 0.3636,
+          "tpr": 0.9014,
+          "fpr": 0.1947,
+          "brier": 0.1208,
+          "calibration_gap": 0.1169,
+          "roc_auc": 0.9228
+        },
+        "South America": {
+          "n": 675,
+          "positive_rate": 0.3081,
+          "selection_rate": 0.5319,
+          "tpr": 0.976,
+          "fpr": 0.334,
+          "brier": 0.1659,
+          "calibration_gap": 0.1853,
+          "roc_auc": 0.917
+        },
+        "South Asia": {
+          "n": 8015,
+          "positive_rate": 0.7007,
+          "selection_rate": 0.8444,
+          "tpr": 0.9788,
+          "fpr": 0.5298,
+          "brier": 0.1308,
+          "calibration_gap": 0.0001,
+          "roc_auc": 0.8759
+        },
+        "Southeast Asia": {
+          "n": 1422,
+          "positive_rate": 0.5281,
+          "selection_rate": 0.7082,
+          "tpr": 0.9334,
+          "fpr": 0.456,
+          "brier": 0.1821,
+          "calibration_gap": 0.0997,
+          "roc_auc": 0.8211
+        },
+        "Sub-Saharan Africa": {
+          "n": 4374,
+          "positive_rate": 0.7147,
+          "selection_rate": 0.8953,
+          "tpr": 0.9702,
+          "fpr": 0.7075,
+          "brier": 0.1657,
+          "calibration_gap": 0.0065,
+          "roc_auc": 0.7529
+        },
+        "Western Europe": {
+          "n": 584,
+          "positive_rate": 0.0651,
+          "selection_rate": 0.0531,
+          "tpr": 0.4737,
+          "fpr": 0.0238,
+          "brier": 0.052,
+          "calibration_gap": 0.0805,
+          "roc_auc": 0.9545
+        }
+      }
+    },
+    "country": {
+      "min_size": 100,
+      "n_groups_reported": 28,
+      "suppressed": {
+        "n_groups": 94,
+        "n_rows": 1528
+      },
+      "disparities": {
+        "tpr": {
+          "max": {
+            "group": "Saudi Arabia",
+            "value": 1.0
+          },
+          "min": {
+            "group": "Israel",
+            "value": 0.3
+          },
+          "range": 0.7
+        },
+        "fpr": {
+          "max": {
+            "group": "Somalia",
+            "value": 0.9467
+          },
+          "min": {
+            "group": "United Kingdom",
+            "value": 0.0338
+          },
+          "range": 0.9129
+        },
+        "roc_auc": {
+          "max": {
+            "group": "United Kingdom",
+            "value": 0.9402
+          },
+          "min": {
+            "group": "Mozambique",
+            "value": 0.558
+          },
+          "range": 0.3822
+        },
+        "worst_calibration_gap": {
+          "group": "Saudi Arabia",
+          "calibration_gap": 0.573
+        }
+      },
+      "groups": {
+        "Afghanistan": {
+          "n": 5608,
+          "positive_rate": 0.8552,
+          "selection_rate": 0.9799,
+          "tpr": 0.9925,
+          "fpr": 0.9052,
+          "brier": 0.1094,
+          "calibration_gap": -0.0776,
+          "roc_auc": 0.8113
+        },
+        "Burkina Faso": {
+          "n": 304,
+          "positive_rate": 0.8191,
+          "selection_rate": 0.9013,
+          "tpr": 0.9799,
+          "fpr": 0.5455,
+          "brier": 0.1208,
+          "calibration_gap": -0.0977,
+          "roc_auc": 0.7782
+        },
+        "Cameroon": {
+          "n": 279,
+          "positive_rate": 0.5412,
+          "selection_rate": 0.7957,
+          "tpr": 0.9404,
+          "fpr": 0.625,
+          "brier": 0.2004,
+          "calibration_gap": 0.1078,
+          "roc_auc": 0.8037
+        },
+        "Chile": {
+          "n": 126,
+          "positive_rate": 0.0317,
+          "selection_rate": 0.0714,
+          "tpr": 0.75,
+          "fpr": 0.0492,
+          "brier": 0.1129,
+          "calibration_gap": 0.2615,
+          "roc_auc": 0.9395
+        },
+        "Colombia": {
+          "n": 465,
+          "positive_rate": 0.3914,
+          "selection_rate": 0.6753,
+          "tpr": 0.978,
+          "fpr": 0.4806,
+          "brier": 0.1829,
+          "calibration_gap": 0.169,
+          "roc_auc": 0.892
+        },
+        "Democratic Republic of the Congo": {
+          "n": 573,
+          "positive_rate": 0.7609,
+          "selection_rate": 0.9284,
+          "tpr": 0.9725,
+          "fpr": 0.7883,
+          "brier": 0.1622,
+          "calibration_gap": -0.0235,
+          "roc_auc": 0.6779
+        },
+        "Egypt": {
+          "n": 118,
+          "positive_rate": 0.6949,
+          "selection_rate": 0.6949,
+          "tpr": 0.7927,
+          "fpr": 0.4722,
+          "brier": 0.1858,
+          "calibration_gap": -0.105,
+          "roc_auc": 0.7275
+        },
+        "India": {
+          "n": 1291,
+          "positive_rate": 0.2905,
+          "selection_rate": 0.4547,
+          "tpr": 0.8587,
+          "fpr": 0.2893,
+          "brier": 0.1886,
+          "calibration_gap": 0.2101,
+          "roc_auc": 0.8541
+        },
+        "Iraq": {
+          "n": 1876,
+          "positive_rate": 0.4142,
+          "selection_rate": 0.9259,
+          "tpr": 0.9884,
+          "fpr": 0.8817,
+          "brier": 0.298,
+          "calibration_gap": 0.3011,
+          "roc_auc": 0.7529
+        },
+        "Israel": {
+          "n": 232,
+          "positive_rate": 0.0862,
+          "selection_rate": 0.0819,
+          "tpr": 0.3,
+          "fpr": 0.0613,
+          "brier": 0.1264,
+          "calibration_gap": 0.2224,
+          "roc_auc": 0.6956
+        },
+        "Kenya": {
+          "n": 130,
+          "positive_rate": 0.4154,
+          "selection_rate": 0.7846,
+          "tpr": 0.9444,
+          "fpr": 0.6711,
+          "brier": 0.2736,
+          "calibration_gap": 0.203,
+          "roc_auc": 0.6171
+        },
+        "Mali": {
+          "n": 326,
+          "positive_rate": 0.7699,
+          "selection_rate": 0.8957,
+          "tpr": 0.9761,
+          "fpr": 0.6267,
+          "brier": 0.1473,
+          "calibration_gap": -0.0674,
+          "roc_auc": 0.7648
+        },
+        "Mozambique": {
+          "n": 317,
+          "positive_rate": 0.6467,
+          "selection_rate": 0.7413,
+          "tpr": 0.8341,
+          "fpr": 0.5714,
+          "brier": 0.2292,
+          "calibration_gap": 0.0137,
+          "roc_auc": 0.558
+        },
+        "Myanmar": {
+          "n": 321,
+          "positive_rate": 0.4486,
+          "selection_rate": 0.648,
+          "tpr": 0.8889,
+          "fpr": 0.452,
+          "brier": 0.2037,
+          "calibration_gap": 0.1326,
+          "roc_auc": 0.8094
+        },
+        "Nepal": {
+          "n": 240,
+          "positive_rate": 0.0208,
+          "selection_rate": 0.0417,
+          "tpr": 0.4,
+          "fpr": 0.034,
+          "brier": 0.0629,
+          "calibration_gap": 0.1751,
+          "roc_auc": 0.8306
+        },
+        "Niger": {
+          "n": 118,
+          "positive_rate": 0.839,
+          "selection_rate": 0.9153,
+          "tpr": 0.9697,
+          "fpr": 0.6316,
+          "brier": 0.1083,
+          "calibration_gap": -0.0939,
+          "roc_auc": 0.8006
+        },
+        "Nigeria": {
+          "n": 1245,
+          "positive_rate": 0.7558,
+          "selection_rate": 0.9414,
+          "tpr": 0.9904,
+          "fpr": 0.7895,
+          "brier": 0.1471,
+          "calibration_gap": 0.0101,
+          "roc_auc": 0.7662
+        },
+        "Pakistan": {
+          "n": 789,
+          "positive_rate": 0.5311,
+          "selection_rate": 0.8175,
+          "tpr": 0.9403,
+          "fpr": 0.6784,
+          "brier": 0.2096,
+          "calibration_gap": 0.136,
+          "roc_auc": 0.7914
+        },
+        "Philippines": {
+          "n": 833,
+          "positive_rate": 0.6002,
+          "selection_rate": 0.7863,
+          "tpr": 0.952,
+          "fpr": 0.5375,
+          "brier": 0.1772,
+          "calibration_gap": 0.0744,
+          "roc_auc": 0.7872
+        },
+        "Saudi Arabia": {
+          "n": 195,
+          "positive_rate": 0.0308,
+          "selection_rate": 0.8974,
+          "tpr": 1.0,
+          "fpr": 0.8942,
+          "brier": 0.3562,
+          "calibration_gap": 0.573,
+          "roc_auc": 0.8849
+        },
+        "Somalia": {
+          "n": 641,
+          "positive_rate": 0.7363,
+          "selection_rate": 0.9782,
+          "tpr": 0.9894,
+          "fpr": 0.9467,
+          "brier": 0.1719,
+          "calibration_gap": -0.0036,
+          "roc_auc": 0.7232
+        },
+        "Syria": {
+          "n": 627,
+          "positive_rate": 0.6571,
+          "selection_rate": 0.9522,
+          "tpr": 0.9879,
+          "fpr": 0.8837,
+          "brier": 0.2029,
+          "calibration_gap": 0.0854,
+          "roc_auc": 0.733
+        },
+        "Thailand": {
+          "n": 195,
+          "positive_rate": 0.3333,
+          "selection_rate": 0.4564,
+          "tpr": 0.8769,
+          "fpr": 0.2462,
+          "brier": 0.1707,
+          "calibration_gap": 0.1705,
+          "roc_auc": 0.8947
+        },
+        "Turkey": {
+          "n": 103,
+          "positive_rate": 0.5825,
+          "selection_rate": 0.7184,
+          "tpr": 0.8667,
+          "fpr": 0.5116,
+          "brier": 0.1924,
+          "calibration_gap": -0.004,
+          "roc_auc": 0.7357
+        },
+        "United Kingdom": {
+          "n": 215,
+          "positive_rate": 0.0372,
+          "selection_rate": 0.0558,
+          "tpr": 0.625,
+          "fpr": 0.0338,
+          "brier": 0.0556,
+          "calibration_gap": 0.1192,
+          "roc_auc": 0.9402
+        },
+        "United States": {
+          "n": 201,
+          "positive_rate": 0.1542,
+          "selection_rate": 0.2886,
+          "tpr": 0.9032,
+          "fpr": 0.1765,
+          "brier": 0.1169,
+          "calibration_gap": 0.1362,
+          "roc_auc": 0.8917
+        },
+        "West Bank and Gaza Strip": {
+          "n": 199,
+          "positive_rate": 0.2563,
+          "selection_rate": 0.4925,
+          "tpr": 0.8431,
+          "fpr": 0.3716,
+          "brier": 0.1977,
+          "calibration_gap": 0.1904,
+          "roc_auc": 0.7725
+        },
+        "Yemen": {
+          "n": 1158,
+          "positive_rate": 0.5086,
+          "selection_rate": 0.9111,
+          "tpr": 0.9677,
+          "fpr": 0.8524,
+          "brier": 0.2489,
+          "calibration_gap": 0.1656,
+          "roc_auc": 0.7045
+        }
+      }
+    },
+    "nationality": {
+      "min_size": 100,
+      "n_groups_reported": 29,
+      "suppressed": {
+        "n_groups": 110,
+        "n_rows": 1697
+      },
+      "disparities": {
+        "tpr": {
+          "max": {
+            "group": "Afghanistan",
+            "value": 0.9925
+          },
+          "min": {
+            "group": "Nepal",
+            "value": 0.4
+          },
+          "range": 0.5925
+        },
+        "fpr": {
+          "max": {
+            "group": "Somalia",
+            "value": 0.9302
+          },
+          "min": {
+            "group": "Nepal",
+            "value": 0.0385
+          },
+          "range": 0.8917
+        },
+        "roc_auc": {
+          "max": {
+            "group": "Northern Ireland",
+            "value": 0.9675
+          },
+          "min": {
+            "group": "Mozambique",
+            "value": 0.5557
+          },
+          "range": 0.4118
+        },
+        "worst_calibration_gap": {
+          "group": "Saudi Arabia",
+          "calibration_gap": 0.5597
+        }
+      },
+      "groups": {
+        "Afghanistan": {
+          "n": 5309,
+          "positive_rate": 0.8802,
+          "selection_rate": 0.9798,
+          "tpr": 0.9925,
+          "fpr": 0.8868,
+          "brier": 0.0995,
+          "calibration_gap": -0.0963,
+          "roc_auc": 0.7876
+        },
+        "Burkina Faso": {
+          "n": 298,
+          "positive_rate": 0.8154,
+          "selection_rate": 0.9027,
+          "tpr": 0.9835,
+          "fpr": 0.5455,
+          "brier": 0.1194,
+          "calibration_gap": -0.0919,
+          "roc_auc": 0.7837
+        },
+        "Cameroon": {
+          "n": 272,
+          "positive_rate": 0.5404,
+          "selection_rate": 0.7978,
+          "tpr": 0.9388,
+          "fpr": 0.632,
+          "brier": 0.1995,
+          "calibration_gap": 0.1097,
+          "roc_auc": 0.8088
+        },
+        "Chile": {
+          "n": 126,
+          "positive_rate": 0.0317,
+          "selection_rate": 0.0714,
+          "tpr": 0.75,
+          "fpr": 0.0492,
+          "brier": 0.1129,
+          "calibration_gap": 0.2615,
+          "roc_auc": 0.9395
+        },
+        "Colombia": {
+          "n": 457,
+          "positive_rate": 0.3917,
+          "selection_rate": 0.6805,
+          "tpr": 0.9777,
+          "fpr": 0.4892,
+          "brier": 0.1831,
+          "calibration_gap": 0.169,
+          "roc_auc": 0.8909
+        },
+        "Democratic Republic of the Congo": {
+          "n": 546,
+          "positive_rate": 0.7802,
+          "selection_rate": 0.9341,
+          "tpr": 0.9742,
+          "fpr": 0.7917,
+          "brier": 0.1567,
+          "calibration_gap": -0.0369,
+          "roc_auc": 0.6573
+        },
+        "Egypt": {
+          "n": 120,
+          "positive_rate": 0.6917,
+          "selection_rate": 0.6917,
+          "tpr": 0.7952,
+          "fpr": 0.4595,
+          "brier": 0.1859,
+          "calibration_gap": -0.1039,
+          "roc_auc": 0.7338
+        },
+        "India": {
+          "n": 1291,
+          "positive_rate": 0.2905,
+          "selection_rate": 0.4524,
+          "tpr": 0.8587,
+          "fpr": 0.286,
+          "brier": 0.1876,
+          "calibration_gap": 0.2088,
+          "roc_auc": 0.8552
+        },
+        "International": {
+          "n": 477,
+          "positive_rate": 0.3438,
+          "selection_rate": 0.8721,
+          "tpr": 0.9146,
+          "fpr": 0.8498,
+          "brier": 0.3046,
+          "calibration_gap": 0.3117,
+          "roc_auc": 0.6884
+        },
+        "Iraq": {
+          "n": 1653,
+          "positive_rate": 0.4586,
+          "selection_rate": 0.9256,
+          "tpr": 0.9894,
+          "fpr": 0.8715,
+          "brier": 0.2836,
+          "calibration_gap": 0.2655,
+          "roc_auc": 0.734
+        },
+        "Israel": {
+          "n": 304,
+          "positive_rate": 0.2138,
+          "selection_rate": 0.3125,
+          "tpr": 0.7077,
+          "fpr": 0.205,
+          "brier": 0.1638,
+          "calibration_gap": 0.1671,
+          "roc_auc": 0.7977
+        },
+        "Kenya": {
+          "n": 128,
+          "positive_rate": 0.4141,
+          "selection_rate": 0.7812,
+          "tpr": 0.9434,
+          "fpr": 0.6667,
+          "brier": 0.2742,
+          "calibration_gap": 0.2045,
+          "roc_auc": 0.6152
+        },
+        "Mali": {
+          "n": 273,
+          "positive_rate": 0.8132,
+          "selection_rate": 0.9377,
+          "tpr": 0.991,
+          "fpr": 0.7059,
+          "brier": 0.1343,
+          "calibration_gap": -0.0884,
+          "roc_auc": 0.7241
+        },
+        "Mozambique": {
+          "n": 313,
+          "positive_rate": 0.6518,
+          "selection_rate": 0.7412,
+          "tpr": 0.8333,
+          "fpr": 0.5688,
+          "brier": 0.2284,
+          "calibration_gap": 0.008,
+          "roc_auc": 0.5557
+        },
+        "Myanmar": {
+          "n": 317,
+          "positive_rate": 0.4479,
+          "selection_rate": 0.6435,
+          "tpr": 0.8873,
+          "fpr": 0.4457,
+          "brier": 0.2029,
+          "calibration_gap": 0.1327,
+          "roc_auc": 0.8115
+        },
+        "Nepal": {
+          "n": 239,
+          "positive_rate": 0.0209,
+          "selection_rate": 0.046,
+          "tpr": 0.4,
+          "fpr": 0.0385,
+          "brier": 0.0642,
+          "calibration_gap": 0.1776,
+          "roc_auc": 0.8274
+        },
+        "Niger": {
+          "n": 112,
+          "positive_rate": 0.8571,
+          "selection_rate": 0.9286,
+          "tpr": 0.9688,
+          "fpr": 0.6875,
+          "brier": 0.1067,
+          "calibration_gap": -0.1088,
+          "roc_auc": 0.7699
+        },
+        "Nigeria": {
+          "n": 1229,
+          "positive_rate": 0.7535,
+          "selection_rate": 0.943,
+          "tpr": 0.9924,
+          "fpr": 0.7921,
+          "brier": 0.1468,
+          "calibration_gap": 0.0145,
+          "roc_auc": 0.7708
+        },
+        "Northern Ireland": {
+          "n": 150,
+          "positive_rate": 0.0267,
+          "selection_rate": 0.06,
+          "tpr": 0.75,
+          "fpr": 0.0411,
+          "brier": 0.0588,
+          "calibration_gap": 0.1431,
+          "roc_auc": 0.9675
+        },
+        "Pakistan": {
+          "n": 779,
+          "positive_rate": 0.5327,
+          "selection_rate": 0.8164,
+          "tpr": 0.9422,
+          "fpr": 0.6731,
+          "brier": 0.2071,
+          "calibration_gap": 0.1338,
+          "roc_auc": 0.7963
+        },
+        "Philippines": {
+          "n": 831,
+          "positive_rate": 0.6005,
+          "selection_rate": 0.7858,
+          "tpr": 0.9519,
+          "fpr": 0.5361,
+          "brier": 0.1771,
+          "calibration_gap": 0.0741,
+          "roc_auc": 0.7866
+        },
+        "Saudi Arabia": {
+          "n": 212,
+          "positive_rate": 0.0377,
+          "selection_rate": 0.8679,
+          "tpr": 0.875,
+          "fpr": 0.8676,
+          "brier": 0.3517,
+          "calibration_gap": 0.5597,
+          "roc_auc": 0.6244
+        },
+        "Somalia": {
+          "n": 547,
+          "positive_rate": 0.7642,
+          "selection_rate": 0.9744,
+          "tpr": 0.988,
+          "fpr": 0.9302,
+          "brier": 0.1596,
+          "calibration_gap": -0.0297,
+          "roc_auc": 0.731
+        },
+        "Syria": {
+          "n": 538,
+          "positive_rate": 0.6822,
+          "selection_rate": 0.9498,
+          "tpr": 0.9864,
+          "fpr": 0.8713,
+          "brier": 0.1986,
+          "calibration_gap": 0.0678,
+          "roc_auc": 0.6959
+        },
+        "Thailand": {
+          "n": 192,
+          "positive_rate": 0.3385,
+          "selection_rate": 0.4635,
+          "tpr": 0.8769,
+          "fpr": 0.252,
+          "brier": 0.1711,
+          "calibration_gap": 0.1672,
+          "roc_auc": 0.8922
+        },
+        "Turkey": {
+          "n": 165,
+          "positive_rate": 0.5758,
+          "selection_rate": 0.7697,
+          "tpr": 0.9158,
+          "fpr": 0.5714,
+          "brier": 0.188,
+          "calibration_gap": 0.0214,
+          "roc_auc": 0.7482
+        },
+        "United States": {
+          "n": 249,
+          "positive_rate": 0.1847,
+          "selection_rate": 0.3454,
+          "tpr": 0.8696,
+          "fpr": 0.2266,
+          "brier": 0.1391,
+          "calibration_gap": 0.1624,
+          "roc_auc": 0.8736
+        },
+        "Yemen": {
+          "n": 1088,
+          "positive_rate": 0.5267,
+          "selection_rate": 0.92,
+          "tpr": 0.9738,
+          "fpr": 0.8602,
+          "brier": 0.2451,
+          "calibration_gap": 0.1535,
+          "roc_auc": 0.7005
+        },
+        "unknown": {
+          "n": 341,
+          "positive_rate": 0.2991,
+          "selection_rate": 0.8358,
+          "tpr": 0.9902,
+          "fpr": 0.7699,
+          "brier": 0.2761,
+          "calibration_gap": 0.303,
+          "roc_auc": 0.728
+        }
+      }
+    }
+  },
+  "ablation": {
+    "sensitive_fields": [
+      "country",
+      "region",
+      "natlty1"
+    ],
+    "with_sensitive": {
+      "n": 20253,
+      "positive_rate": 0.5895,
+      "accuracy": 0.7505,
+      "f1": 0.8204,
+      "brier": 0.1692,
+      "roc_auc": 0.84,
+      "pr_auc": 0.8557
+    },
+    "without_sensitive": {
+      "n": 20253,
+      "positive_rate": 0.5895,
+      "accuracy": 0.7249,
+      "f1": 0.8086,
+      "brier": 0.1796,
+      "roc_auc": 0.8193,
+      "pr_auc": 0.8419
+    },
+    "cost_of_removing": {
+      "roc_auc": 0.0207,
+      "brier": 0.0104
+    }
+  }
+}

@@ -12,7 +12,7 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 | **1** | Model A (GTD-only, leakage-safe, calibrated) | **done** — ROC-AUC 0.84, Brier 0.169 on ≥2019 holdout |
 | 🚦 | **Gate: Model A must beat baselines before any multi-source work** | **PASSED** (beats all baselines on AUC & Brier) |
 | **2** | FastAPI inference service + Docker | **done** — serves the trained model; `/health` · `/v1/models` · `/v1/predict` verified end-to-end |
-| 3 | Fairness audit + model card | not started |
+| **3** | Fairness audit + model card | **done** — subgroup audit + sensitive-field ablation; [model card](docs/model_card.md) filled |
 | 4 | Model C (RAG explanation) | not started |
 | 5 | Honest scenario sweep | not started |
 | 6 | Thin client (Android/web) | not started |
@@ -67,6 +67,18 @@ file's SHA-256 matches the registry.
 **Current result** (untouched ≥2019 temporal holdout, 20,253 incidents): ROC-AUC **0.840**,
 PR-AUC 0.856, Brier **0.169** — beats every required baseline on both AUC and Brier, so the
 Phase-1 gate is **passed**. This honest ~0.84 replaces draft-1's leaky 86% accuracy.
+
+**Responsible-AI audit** (Phase 3) — per-subgroup fairness (region/country/nationality) plus a
+sensitive-field ablation:
+
+```bash
+pip install -e ".[fairness]"   # fairlearn
+python -m training.audit       # -> reports/fairness_A.json
+```
+
+Findings are written up in the [model card](docs/model_card.md): notably, removing the
+sensitive geography fields costs only ~0.02 AUC, and the model over-predicts fatality in some
+regions (MENA calibration gap +0.22) — read the card before relying on any subgroup number.
 
 ## Serving — the inference API (Phase 2)
 
