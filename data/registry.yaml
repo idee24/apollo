@@ -34,9 +34,18 @@ datasets:
       narratives (summary, weapdetail, scite*) server-side and access-controlled.
       A public or commercial deployment requires the UMD agreement first.
     time_coverage: "1970-2020 (main file) + 2021-01..2021-06 (separate file); 1993 missing"
-    version: TBD                 # record exact release once downloaded
-    local_path: TBD              # e.g. data/raw/gtd/gtd_1970_2020.csv
-    sha256: TBD
+    version: >
+      globalterrorismdb_0522dist (May 2022 release, 1970-2020) +
+      globalterrorismdb_2021Jan-June_1222dist (Dec 2022, 2021 H1);
+      combined into one pinned UTF-8 CSV covering 1970-2021 (214,666 rows).
+    source_files:               # original .xlsx releases, kept server-side (gitignored)
+      - data/raw/gtd/globalterrorismdb_0522dist.xlsx
+      - data/raw/gtd/globalterrorismdb_2021Jan-June_1222dist.xlsx
+    codebook: data/raw/gtd/Codebook.pdf
+    eula: data/raw/gtd/GTDEULA2022_0.pdf
+    local_path: data/raw/gtd/globalterrorismdb_1970_2021.csv
+    sha256: 1006c27e8fd5bf1936ff671aca8466bc5792a9c1f84c61a3c9e16bb3e6311bc0
+    obtained: "2026-07-27"       # downloaded via START/UMD request form
     refresh_policy: Re-check availability & terms each production refresh; access may change.
 
   ucdp_ged:

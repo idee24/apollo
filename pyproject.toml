@@ -21,6 +21,7 @@ models = ["lightgbm>=4.3"]          # gradient-boosted challenger to the RF base
 api = ["fastapi>=0.111", "uvicorn[standard]>=0.30", "pydantic>=2.7"]
 fairness = ["fairlearn>=0.10"]
 dev = ["pytest>=8.2", "ruff>=0.5", "httpx>=0.27"]  # httpx powers fastapi TestClient
+ingest = ["openpyxl>=3.1"]          # one-off: convert official GTD .xlsx releases to the pinned CSV
 
 [build-system]
 requires = ["setuptools>=68"]

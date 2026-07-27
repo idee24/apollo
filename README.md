@@ -8,10 +8,10 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 
 | Phase | What | State |
 |-------|------|-------|
-| **0** | Scaffold, data registry, prediction-time contract, legal path | **in progress** |
-| 1 | Model A (GTD-only, leakage-safe, calibrated) | not started |
-| 🚦 | **Gate: Model A must beat baselines before any multi-source work** | — |
-| 2 | FastAPI inference service + Docker | not started |
+| **0** | Scaffold, data registry, prediction-time contract, legal path | **done** — GTD pinned (1970–2021, hash in registry) |
+| **1** | Model A (GTD-only, leakage-safe, calibrated) | **done** — ROC-AUC 0.84, Brier 0.169 on ≥2019 holdout |
+| 🚦 | **Gate: Model A must beat baselines before any multi-source work** | **PASSED** (beats all baselines on AUC & Brier) |
+| 2 | FastAPI inference service + Docker | code scaffolded — wire artifact loading next |
 | 3 | Fairness audit + model card | not started |
 | 4 | Model C (RAG explanation) | not started |
 | 5 | Honest scenario sweep | not started |
@@ -51,9 +51,32 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## Training — Model A
+
+With GTD pinned under `data/raw/gtd/` (see below), train, calibrate, evaluate against
+the required baselines, and persist the artifact:
+
+```bash
+python -m training.train
+```
+
+This writes a calibrated model to `models/` (gitignored) and a metrics report to
+[`reports/model_A_metrics.json`](reports/model_A_metrics.json). Training **refuses to run** unless the data
+file's SHA-256 matches the registry.
+
+**Current result** (untouched ≥2019 temporal holdout, 20,253 incidents): ROC-AUC **0.840**,
+PR-AUC 0.856, Brier **0.169** — beats every required baseline on both AUC and Brier, so the
+Phase-1 gate is **passed**. This honest ~0.84 replaces draft-1's leaky 86% accuracy.
+
 ## Data — you must obtain GTD yourself
 
-GTD is **access-gated and non-redistributable** (non-commercial research only; raw data may not be republished on any public site). Apollo does not and cannot ship it. Request it via the GTD download form, then place the file under `data/raw/` and record its hash in `data/registry.yaml`. See [`data/raw/README.md`](data/raw/README.md) and `STRATEGY.md` §5.2.
+GTD is **access-gated and non-redistributable** (non-commercial research only; raw data may not be republished on any public site). Apollo does not and cannot ship it. Request it via the GTD download form, then place the files under `data/raw/gtd/` (gitignored) and pin them in [`data/registry.yaml`](data/registry.yaml). See [`data/raw/README.md`](data/raw/README.md) and `STRATEGY.md` §5.2.
+
+The pinned dataset for the current model is a single **UTF-8 CSV covering 1970–2021**
+(214,666 rows), derived once from the official `.xlsx` releases — the May-2022 main file
+(1970–2020) plus the 2021 H1 supplement — concatenated (identical 135-column schema). The
+one-off conversion needs the ingest extra (`pip install -e ".[ingest]"`, for `openpyxl`);
+the resulting CSV's hash is recorded in the registry so the pinned data can't silently change.
 
 ## Non-negotiables (why draft 2 exists)
 

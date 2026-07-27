@@ -11,8 +11,10 @@ REGISTRY_PATH = DATA_DIR / "registry.yaml"
 REPORTS_DIR = REPO_ROOT / "reports"
 MODELS_DIR = REPO_ROOT / "models"
 
-# GTD ships as Latin-1, not UTF-8.
-GTD_ENCODING = "ISO-8859-1"
+# The official GTD CSV ships as Latin-1. Apollo's pinned file, however, is a
+# UTF-8 CSV derived once from the official .xlsx releases (main 1970-2020 +
+# 2021 H1 supplement) and pinned by SHA-256 in the registry. See data/raw/README.md.
+GTD_ENCODING = "utf-8"
 
 # Temporal split (STRATEGY.md §9): no random split for the headline number.
 # The latest period is an untouched test set.
