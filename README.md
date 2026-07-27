@@ -1,6 +1,6 @@
 # Apollo — Engine (Draft 2)
 
-Apollo estimates the **probability that a described violent incident results in one or more fatalities**, from the Global Terrorism Database (GTD). It is a *conditional lethality estimator* — retrospective, probabilistic, decision-support — **not** an early-warning system. See [`docs/intended_use.md`](docs/intended_use.md).
+Apollo predicts the **probability that a violent incident results in one or more fatalities**, from the Global Terrorism Database (GTD). It supports both fully described incidents and a location/year forecast that integrates over historically plausible incident characteristics. It does not predict incident occurrence or counts. See [`docs/intended_use.md`](docs/intended_use.md).
 
 This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is in [`STRATEGY.md`](STRATEGY.md).
 
@@ -99,6 +99,7 @@ Endpoints:
 | `GET /health` | liveness + whether a model is loaded |
 | `GET /v1/models` | active version, test metrics, gate verdict, exposed feature columns |
 | `POST /v1/predict` | scenario (GTD integer codes) → calibrated `P(≥1 fatality)` + uncertainty band + disclaimer |
+| `POST /v1/forecast` | **year + location only** → marginal fatality prediction, distribution, and highest-risk plausible scenarios |
 | `POST /v1/explain` | same scenario → the calibrated number **plus** a grounded plain-language explanation with evidence (Model C) |
 | `POST /v1/scenario` | fixed scenario + year range → date-indexed probabilities, **explicitly labelled non-forecast** |
 
@@ -116,6 +117,25 @@ The request schema uses `extra="forbid"`, so any banned outcome field (e.g. `nki
 rejected with **422** at the boundary. The uncertainty band is the min–max spread across the
 calibration folds — an honest indication of model disagreement, deliberately not a tight CI.
 Auth (`APOLLO_API_KEY`) and rate limiting (`APOLLO_RATE_LIMIT_PER_MIN`) are opt-in via env vars.
+
+**Location/year forecast (`/v1/forecast`).** This is the streamlined prediction
+interface: the request contains only `year` and `location`. During training Apollo
+stores a bounded, geographically stratified, leakage-safe reference population plus
+a derived country/province place-name index. Ambiguous names are rejected instead
+of being silently mapped to the wrong geography.
+At inference it replaces the requested time and geography on each relevant reference
+row, varies all other characteristics across that empirical population, scores every
+combination, and returns the mean, scenario-spread quantiles (not a confidence
+interval), and five highest-probability plausible
+points. For example: `{"year": 2050, "location": "Alaska"}`. Place names must occur
+in the training data; `country:<code>` and `region:<code>` are stable fallbacks.
+
+This is a genuine model-based prediction of severity **conditional on an incident**,
+not a prediction that an incident will happen. Years after 2021 are explicit model
+extrapolations. Existing artifacts must be retrained once to include the reference
+population and place index.
+The top-down implementation assessment and the boundary for a future occurrence
+model are documented in [`docs/forecast_design.md`](docs/forecast_design.md).
 
 **Scenario sweep (`/v1/scenario`).** The honest replacement for draft 1's fake "time series"
 (flaw #5): it varies **only the date** across one fixed incident and returns the conditional

@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException
 
 from api import explain as explain_service
+from api import forecast as forecast_service
 from api import scenario as scenario_service
 from api import service
 from api.knowledge import build_retriever
@@ -20,6 +21,8 @@ from api.llm import get_llm
 from api.model_registry import load_model
 from api.schemas import (
     ExplainResponse,
+    ForecastRequest,
+    ForecastResponse,
     PredictRequest,
     PredictResponse,
     ScenarioRequest,
@@ -43,6 +46,23 @@ app = FastAPI(
     summary="Conditional lethality estimator — retrospective, probabilistic decision-support.",
     lifespan=lifespan,
 )
+
+
+@app.post(
+    "/v1/forecast",
+    response_model=ForecastResponse,
+    dependencies=[Depends(require_api_key), Depends(rate_limit)],
+)
+def forecast(req: ForecastRequest) -> ForecastResponse:
+    m = app.state.model
+    if not m:
+        raise HTTPException(status_code=503, detail="No model loaded. Train Model A first.")
+    try:
+        out = forecast_service.forecast(m["bundle"], req.year, req.location)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    out["model_version"] = m["version"]
+    return ForecastResponse(**out)
 
 
 @app.get("/health")
