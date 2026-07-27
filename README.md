@@ -8,10 +8,10 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 
 | Phase | What | State |
 |-------|------|-------|
-| **0** | Scaffold, data registry, prediction-time contract, legal path | **in progress** |
-| 1 | Model A (GTD-only, leakage-safe, calibrated) | not started |
-| 🚦 | **Gate: Model A must beat baselines before any multi-source work** | — |
-| 2 | FastAPI inference service + Docker | not started |
+| **0** | Scaffold, data registry, prediction-time contract, legal path | **done** — GTD pinned (1970–2021, hash in registry) |
+| **1** | Model A (GTD-only, leakage-safe, calibrated) | **done** — ROC-AUC 0.84, Brier 0.169 on ≥2019 holdout |
+| 🚦 | **Gate: Model A must beat baselines before any multi-source work** | **PASSED** (beats all baselines on AUC & Brier) |
+| 2 | FastAPI inference service + Docker | code scaffolded — wire artifact loading next |
 | 3 | Fairness audit + model card | not started |
 | 4 | Model C (RAG explanation) | not started |
 | 5 | Honest scenario sweep | not started |

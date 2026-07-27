@@ -1,0 +1,83 @@
+{
+  "generated_utc": "2026-07-27T03:13:54+00:00",
+  "gtd_version": "globalterrorismdb_0522dist (May 2022 release, 1970-2020) + globalterrorismdb_2021Jan-June_1222dist (Dec 2022, 2021 H1); combined into one pinned UTF-8 CSV covering 1970-2021 (214,666 rows).\n",
+  "artifact": "model_A_20260727T031353Z.joblib",
+  "split": {
+    "train": {
+      "n": 148489,
+      "positive_rate": 0.4775
+    },
+    "val": {
+      "n": 32973,
+      "positive_rate": 0.5353
+    },
+    "test": {
+      "n": 20253,
+      "positive_rate": 0.5895
+    }
+  },
+  "features": {
+    "numeric": [
+      "iyear",
+      "latitude",
+      "longitude"
+    ],
+    "categorical": [
+      "imonth",
+      "country",
+      "region",
+      "specificity",
+      "vicinity",
+      "attacktype1",
+      "targtype1",
+      "targsubtype1",
+      "natlty1",
+      "weaptype1",
+      "weapsubtype1",
+      "suicide"
+    ]
+  },
+  "model": {
+    "type": "RandomForest+isotonic-calibration",
+    "metrics_test": {
+      "n": 20253,
+      "positive_rate": 0.5895,
+      "accuracy": 0.7505,
+      "f1": 0.8204,
+      "brier": 0.1692,
+      "roc_auc": 0.84,
+      "pr_auc": 0.8557
+    }
+  },
+  "baselines": {
+    "prevalence": {
+      "n": 20253,
+      "positive_rate": 0.5895,
+      "accuracy": 0.4105,
+      "f1": 0.0,
+      "brier": 0.2545,
+      "roc_auc": 0.5,
+      "pr_auc": 0.5895
+    },
+    "group_prevalence[attacktype1]": {
+      "n": 20253,
+      "positive_rate": 0.5895,
+      "accuracy": 0.69,
+      "f1": 0.7084,
+      "brier": 0.2068,
+      "roc_auc": 0.7317,
+      "pr_auc": 0.7313
+    }
+  },
+  "beats_baselines": {
+    "prevalence": {
+      "better_auc": true,
+      "better_brier": true
+    },
+    "group_prevalence[attacktype1]": {
+      "better_auc": true,
+      "better_brier": true
+    },
+    "PASS_GATE": true
+  }
+}
