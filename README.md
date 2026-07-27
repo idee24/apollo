@@ -15,7 +15,7 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 | **3** | Fairness audit + model card | **done** — subgroup audit + sensitive-field ablation; [model card](docs/model_card.md) filled |
 | **4** | Model C (RAG explanation) | **done** — `/v1/explain`, grounded template + optional LLM; never alters the number |
 | **5** | Honest scenario sweep | **done** — `/v1/scenario` date sweep, explicitly labelled non-forecast |
-| 6 | Thin client (Android/web) | not started |
+| **6** | Thin client (Android/web) | **web done** — separate repo `../apollo-web` (dependency-free dashboard over the API) |
 | 7+ | Model B (regional-month risk — research track) | not started |
 
 ## Layout
