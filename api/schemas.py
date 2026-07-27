@@ -45,6 +45,33 @@ class PredictResponse(BaseModel):
     disclaimer: str
 
 
+class ForecastRequest(BaseModel):
+    """The only public inputs needed for a marginal location/year forecast."""
+
+    model_config = ConfigDict(extra="forbid")
+    year: int = Field(..., ge=1970, le=2100)
+    location: str = Field(..., min_length=1, max_length=200)
+
+
+class ForecastPoint(BaseModel):
+    probability: float
+    scenario: str
+    features: dict[str, int | float]
+
+
+class ForecastResponse(BaseModel):
+    year: int
+    location: str
+    probability: float
+    distribution: dict[str, float]
+    scenarios_evaluated: int
+    positive_points: list[ForecastPoint]
+    target: str
+    method: str
+    model_version: str
+    disclaimer: str
+
+
 class ScenarioRequest(BaseModel):
     """A fixed incident scenario plus a date range to sweep. `iyear`/`imonth` are
     NOT accepted here — they are the swept variables."""

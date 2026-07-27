@@ -11,6 +11,7 @@ encoders, calibration) is fit inside the training data only.
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime
 
 import joblib
@@ -78,7 +79,15 @@ def train_and_evaluate() -> dict:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     MODELS_DIR.mkdir(exist_ok=True)
     artifact = MODELS_DIR / f"model_A_{stamp}.joblib"
-    joblib.dump({"model": model, "numeric": numeric, "categorical": categorical}, artifact)
+    forecast_reference = Xtr.sample(min(10_000, len(Xtr)), random_state=42)
+    location_catalog = _build_location_catalog(df, forecast_reference.index)
+    joblib.dump({
+        "model": model,
+        "numeric": numeric,
+        "categorical": categorical,
+        "forecast_reference": forecast_reference,
+        "location_catalog": location_catalog,
+    }, artifact)
 
     result = {
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -95,6 +104,34 @@ def train_and_evaluate() -> dict:
         json.dumps(result, indent=2), encoding="utf-8"
     )
     return result
+
+
+def _normalise_location(value: str) -> str:
+    """Keep training independent of the API package while matching its keys."""
+    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
+
+
+def _build_location_catalog(df, indices) -> dict[str, dict]:
+    """Build place aliases without shipping any raw incident or narrative text."""
+    available = df.loc[df.index.intersection(indices)]
+    catalog: dict[str, dict] = {}
+    for text_col in ("country_txt", "provstate", "city"):
+        if text_col not in available:
+            continue
+        for name, group in available.dropna(subset=[text_col]).groupby(text_col):
+            key = _normalise_location(str(name))
+            if not key or len(group) < 2:
+                continue
+            entry: dict = {"label": str(name)}
+            for code in ("country", "region"):
+                if code in group and group[code].notna().any():
+                    entry[code] = int(group[code].mode().iloc[0])
+            for coord in ("latitude", "longitude"):
+                if coord in group and group[coord].notna().any():
+                    entry[coord] = float(group[coord].median())
+            # Prefer the more specific alias when duplicate names occur.
+            catalog[key] = entry
+    return catalog
 
 
 def _beats(model_metrics: dict, baseline_metrics: dict) -> dict:
