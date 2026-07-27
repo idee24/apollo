@@ -11,7 +11,7 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 | **0** | Scaffold, data registry, prediction-time contract, legal path | **done** — GTD pinned (1970–2021, hash in registry) |
 | **1** | Model A (GTD-only, leakage-safe, calibrated) | **done** — ROC-AUC 0.84, Brier 0.169 on ≥2019 holdout |
 | 🚦 | **Gate: Model A must beat baselines before any multi-source work** | **PASSED** (beats all baselines on AUC & Brier) |
-| 2 | FastAPI inference service + Docker | code scaffolded — wire artifact loading next |
+| **2** | FastAPI inference service + Docker | **done** — serves the trained model; `/health` · `/v1/models` · `/v1/predict` verified end-to-end |
 | 3 | Fairness audit + model card | not started |
 | 4 | Model C (RAG explanation) | not started |
 | 5 | Honest scenario sweep | not started |
@@ -67,6 +67,41 @@ file's SHA-256 matches the registry.
 **Current result** (untouched ≥2019 temporal holdout, 20,253 incidents): ROC-AUC **0.840**,
 PR-AUC 0.856, Brier **0.169** — beats every required baseline on both AUC and Brier, so the
 Phase-1 gate is **passed**. This honest ~0.84 replaces draft-1's leaky 86% accuracy.
+
+## Serving — the inference API (Phase 2)
+
+The API loads the newest `models/model_A_*.joblib` artifact **once at startup** and serves
+only derived outputs — never raw GTD records (a design choice and a licence requirement).
+
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+# or containerised (artifacts are mounted, never baked in):
+#   docker build -t apollo-engine .
+#   docker run -p 8000:8000 -v "$(pwd)/models:/app/models" apollo-engine
+```
+
+Endpoints:
+
+| Route | Purpose |
+|---|---|
+| `GET /health` | liveness + whether a model is loaded |
+| `GET /v1/models` | active version, test metrics, gate verdict, exposed feature columns |
+| `POST /v1/predict` | scenario (GTD integer codes) → calibrated `P(≥1 fatality)` + uncertainty band + disclaimer |
+
+Example:
+
+```bash
+curl -s localhost:8000/v1/predict -H 'content-type: application/json' -d '{
+  "iyear": 2019, "country": 95, "region": 10,
+  "attacktype1": 3, "weaptype1": 6, "targtype1": 14, "suicide": 0
+}'
+# → {"probability": 0.634, "uncertainty_low": 0.239, "uncertainty_high": 1.0, ...}
+```
+
+The request schema uses `extra="forbid"`, so any banned outcome field (e.g. `nkill`) is
+rejected with **422** at the boundary. The uncertainty band is the min–max spread across the
+calibration folds — an honest indication of model disagreement, deliberately not a tight CI.
+Auth (`APOLLO_API_KEY`) and rate limiting (`APOLLO_RATE_LIMIT_PER_MIN`) are opt-in via env vars.
 
 ## Data — you must obtain GTD yourself
 
