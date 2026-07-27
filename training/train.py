@@ -11,7 +11,6 @@ encoders, calibration) is fit inside the training data only.
 from __future__ import annotations
 
 import json
-import re
 from datetime import UTC, datetime
 
 import joblib
@@ -23,6 +22,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from engine.leakage import assert_leakage_safe
+from engine.locations import normalize_location
 from engine.schema import split_feature_types
 from training.baselines import default_baselines
 from training.config import MODELS_DIR, REPORTS_DIR
@@ -108,11 +108,6 @@ def train_and_evaluate() -> dict:
     return result
 
 
-def _normalise_location(value: str) -> str:
-    """Keep training independent of the API package while matching its keys."""
-    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
-
-
 def _build_forecast_reference(X, limit: int = 10_000):
     """Bound artifact growth while retaining support for less common countries."""
     if len(X) <= limit:
@@ -150,7 +145,7 @@ def _build_location_catalog(df, indices) -> dict[str, list[dict]]:
             grouping.append("country")
         for group_key, group in available.dropna(subset=[text_col]).groupby(grouping):
             name = group_key[0] if isinstance(group_key, tuple) else group_key
-            key = _normalise_location(str(name))
+            key = normalize_location(str(name))
             if not key or len(group) < 2:
                 continue
             entry: dict = {"label": str(name)}

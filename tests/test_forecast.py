@@ -48,6 +48,25 @@ def test_forecast_varies_nuisance_features(forecast_bundle):
     assert out["method"].startswith("Empirical marginalisation")
 
 
+def test_forecast_reports_local_population_basis(forecast_bundle):
+    # Region 1 has plenty of reference rows, so the mix is marginalised locally.
+    out = forecast(forecast_bundle, 2050, "region:1")
+    assert out["population_basis"] == "region:1"
+
+
+def test_forecast_falls_back_to_global_for_sparse_geography(forecast_bundle):
+    # A geography with no reference rows must fall back to the global mix, and say so.
+    out = forecast(forecast_bundle, 2050, "region:999")
+    assert out["population_basis"] == "global"
+    assert out["scenarios_evaluated"] > 0
+
+
+def test_forecast_positive_points_are_distinct(forecast_bundle):
+    out = forecast(forecast_bundle, 2050, "Alaska")
+    signatures = [tuple(sorted(p["features"].items())) for p in out["positive_points"]]
+    assert len(signatures) == len(set(signatures))
+
+
 def test_forecast_rejects_unknown_location(forecast_bundle):
     with pytest.raises(ValueError, match="Unknown location"):
         forecast(forecast_bundle, 2050, "Atlantis")

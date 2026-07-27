@@ -1,6 +1,6 @@
 # Apollo — Engine (Draft 2)
 
-Apollo predicts the **probability that a violent incident results in one or more fatalities**, from the Global Terrorism Database (GTD). It supports both fully described incidents and a location/year forecast that integrates over historically plausible incident characteristics. It does not predict incident occurrence or counts. See [`docs/intended_use.md`](docs/intended_use.md).
+Apollo estimates the **probability that a described violent incident results in one or more fatalities**, from the Global Terrorism Database (GTD). It is a *conditional lethality estimator* — retrospective, probabilistic, decision-support — **not** an early-warning system. It also exposes a location/year forecast that integrates over historically plausible incident characteristics, but that too estimates severity **conditional on an incident** and does **not** predict incident occurrence or counts. See [`docs/intended_use.md`](docs/intended_use.md).
 
 This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is in [`STRATEGY.md`](STRATEGY.md).
 

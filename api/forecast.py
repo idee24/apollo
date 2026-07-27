@@ -14,6 +14,7 @@ import pandas as pd
 
 from engine.codes import describe_scenario
 from engine.leakage import assert_leakage_safe
+from engine.locations import normalize_location
 
 MAX_EVALUATIONS = 5000
 DISCLAIMER = (
@@ -21,10 +22,6 @@ DISCLAIMER = (
     "not forecast whether or how many incidents will occur. Future years are extrapolations "
     "beyond the 1970-2021 training period. Do not use it to act against a person or group."
 )
-
-
-def normalize_location(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
 
 
 def _resolve_location(bundle: dict, location: str) -> dict:
@@ -65,12 +62,16 @@ def forecast(bundle: dict, year: int, location: str) -> dict:
 
     # Prefer historical rows from the same geography. Fall back to the global
     # empirical distribution if a textual alias has coordinates but few examples.
+    # `population_basis` records which one we used so the caller can see how the
+    # reported expectation is grounded (a local country/region mix vs. global).
     local = reference
+    population_basis = "global"
     for field in ("country", "region"):
         if field in resolved and field in local:
             candidate = local[local[field] == resolved[field]]
             if len(candidate) >= 25:
                 local = candidate
+                population_basis = f"{field}:{resolved[field]}"
                 break
     if len(local) > MAX_EVALUATIONS:
         local = local.sample(MAX_EVALUATIONS, random_state=42)
@@ -84,19 +85,30 @@ def forecast(bundle: dict, year: int, location: str) -> dict:
     model = bundle["model"]
     probabilities = model.predict_proba(X)[:, 1]
 
-    ranked = np.argsort(probabilities)[::-1][:5]
+    # Highest-probability plausible scenarios, distinct on their reported codes so
+    # the list is five *different* scenarios for inspection rather than five
+    # near-identical rows that happen to top the ranking.
     positive_points = []
-    for idx in ranked:
+    seen: set[tuple] = set()
+    for idx in np.argsort(probabilities)[::-1]:
+        idx = int(idx)
         features = {k: X.iloc[idx][k] for k in cols if pd.notna(X.iloc[idx][k])}
+        reported = {
+            k: int(features[k]) if float(features[k]).is_integer() else float(features[k])
+            for k in ("attacktype1", "weaptype1", "targtype1", "suicide")
+            if k in features
+        }
+        signature = tuple(sorted(reported.items()))
+        if signature in seen:
+            continue
+        seen.add(signature)
         positive_points.append({
             "probability": round(float(probabilities[idx]), 4),
             "scenario": describe_scenario(features),
-            "features": {
-                k: int(features[k]) if float(features[k]).is_integer() else float(features[k])
-                for k in ("attacktype1", "weaptype1", "targtype1", "suicide")
-                if k in features
-            },
+            "features": reported,
         })
+        if len(positive_points) == 5:
+            break
 
     q05, q25, q50, q75, q95 = np.quantile(probabilities, [.05, .25, .5, .75, .95])
     return {
@@ -111,6 +123,7 @@ def forecast(bundle: dict, year: int, location: str) -> dict:
         "distribution_description": (
             "Percentiles across plausible incident scenarios; not a confidence interval."
         ),
+        "population_basis": population_basis,
         "scenarios_evaluated": len(X),
         "positive_points": positive_points,
         "target": (

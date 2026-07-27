@@ -75,6 +75,7 @@ class ForecastResponse(BaseModel):
     probability: float
     distribution: ForecastDistribution
     distribution_description: str
+    population_basis: str
     scenarios_evaluated: int
     positive_points: list[ForecastPoint]
     target: str
