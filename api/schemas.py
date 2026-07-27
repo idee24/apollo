@@ -41,3 +41,22 @@ class PredictResponse(BaseModel):
     model_version: str
     target: str
     disclaimer: str
+
+
+class Evidence(BaseModel):
+    source: str = Field(..., description="Doc chunk id, e.g. model_card.md#evaluation")
+    snippet: str
+    score: float
+
+
+class ExplainResponse(BaseModel):
+    probability: float = Field(..., description="Calibrated P(>=1 fatality) — from Model A")
+    uncertainty_low: float
+    uncertainty_high: float
+    model_version: str
+    target: str
+    scenario: str = Field(..., description="Plain-language restatement of the input")
+    explanation: str = Field(..., description="Grounded narrative; never alters the number")
+    evidence: list[Evidence] = Field(default_factory=list)
+    generated_by: str = Field(..., description='"template" or the LLM id, e.g. anthropic:<model>')
+    disclaimer: str

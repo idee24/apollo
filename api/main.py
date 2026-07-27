@@ -12,15 +12,20 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException
 
+from api import explain as explain_service
 from api import service
+from api.knowledge import build_retriever
+from api.llm import get_llm
 from api.model_registry import load_model
-from api.schemas import PredictRequest, PredictResponse
+from api.schemas import ExplainResponse, PredictRequest, PredictResponse
 from api.security import rate_limit, require_api_key
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.model = load_model()  # None until a model is trained
+    app.state.retriever = build_retriever()  # RAG corpus (Apollo docs); None if absent
+    app.state.llm = get_llm()  # provider-agnostic; None -> deterministic template
     yield
 
 
@@ -72,3 +77,20 @@ def predict(req: PredictRequest) -> PredictResponse:
     out = service.predict(m["bundle"], req.model_dump(exclude_none=True))
     out["model_version"] = m["version"]
     return PredictResponse(**out)
+
+
+@app.post(
+    "/v1/explain",
+    response_model=ExplainResponse,
+    dependencies=[Depends(require_api_key), Depends(rate_limit)],
+)
+def explain(req: PredictRequest) -> ExplainResponse:
+    m = app.state.model
+    if not m:
+        raise HTTPException(status_code=503, detail="No model loaded. Train Model A first.")
+    out = explain_service.explain(
+        m["bundle"], req.model_dump(exclude_none=True),
+        retriever=app.state.retriever, llm=app.state.llm,
+    )
+    out["model_version"] = m["version"]
+    return ExplainResponse(**out)

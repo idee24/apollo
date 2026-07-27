@@ -13,7 +13,7 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 | 🚦 | **Gate: Model A must beat baselines before any multi-source work** | **PASSED** (beats all baselines on AUC & Brier) |
 | **2** | FastAPI inference service + Docker | **done** — serves the trained model; `/health` · `/v1/models` · `/v1/predict` verified end-to-end |
 | **3** | Fairness audit + model card | **done** — subgroup audit + sensitive-field ablation; [model card](docs/model_card.md) filled |
-| 4 | Model C (RAG explanation) | not started |
+| **4** | Model C (RAG explanation) | **done** — `/v1/explain`, grounded template + optional LLM; never alters the number |
 | 5 | Honest scenario sweep | not started |
 | 6 | Thin client (Android/web) | not started |
 | 7+ | Model B (regional-month risk — research track) | not started |
@@ -99,6 +99,7 @@ Endpoints:
 | `GET /health` | liveness + whether a model is loaded |
 | `GET /v1/models` | active version, test metrics, gate verdict, exposed feature columns |
 | `POST /v1/predict` | scenario (GTD integer codes) → calibrated `P(≥1 fatality)` + uncertainty band + disclaimer |
+| `POST /v1/explain` | same scenario → the calibrated number **plus** a grounded plain-language explanation with evidence (Model C) |
 
 Example:
 
@@ -114,6 +115,14 @@ The request schema uses `extra="forbid"`, so any banned outcome field (e.g. `nki
 rejected with **422** at the boundary. The uncertainty band is the min–max spread across the
 calibration folds — an honest indication of model disagreement, deliberately not a tight CI.
 Auth (`APOLLO_API_KEY`) and rate limiting (`APOLLO_RATE_LIMIT_PER_MIN`) are opt-in via env vars.
+
+**Model C — explanation (`/v1/explain`).** A retrieval-augmented explainer over Apollo's own
+docs (intended use, model card, prediction-time contract, feature glossary), ranked by TF-IDF —
+no vector DB, no external calls by default. **Hard separation:** the calibrated probability is
+produced by Model A and copied verbatim; the explainer only *phrases* retrieved context and can
+never change the number (guarded by a test where a lying LLM is ignored). An LLM is optional and
+server-side only — set `APOLLO_LLM_PROVIDER`/`APOLLO_LLM_API_KEY`/`APOLLO_LLM_MODEL`; with none
+configured, explanations use a deterministic, fully-grounded template. Keys never reach a client.
 
 ## Data — you must obtain GTD yourself
 
