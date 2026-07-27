@@ -31,12 +31,36 @@ Inference selects the relevant geographic population, overwrites only time and
 location, and scores the remaining empirical feature combinations. This is
 Monte-Carlo-style empirical marginalisation rather than single-value imputation.
 The response reports the mean prediction, scenario-spread quantiles, sample size,
-and the five highest-probability evaluated combinations for inspection.
+and up to five distinct highest-probability evaluated combinations for inspection.
+It also reports `population_basis` — the geography whose historical characteristic
+mix was marginalised over (`country:<code>` / `region:<code>`), or `global` when a
+requested place had too few local reference rows (< 25) and the global empirical
+distribution was used instead. That flag matters because the reported expectation
+is an average over *that* population's incident mix, so the two cases are not
+directly comparable and the caller should be able to tell them apart.
 
 This architecture removes the need for a caller to invent attack, weapon, target,
 nationality, or suicide values. It does **not** remove outcome-leakage protection:
 an outcome field would make evaluation look stronger while making a future
 prediction impossible.
+
+## Artifact data boundary
+
+Persisting `forecast_reference` changes the artifact's data-sensitivity profile.
+Before this feature the artifact held only fitted model parameters; it now also
+embeds a bounded (≤ 10,000-row) verbatim sample of leakage-safe GTD **feature**
+rows — including `latitude`/`longitude` and geography/attack codes. No outcome,
+casualty, narrative, or source fields are included (the leakage guard runs over
+the scored columns), and the API never returns these rows: `/v1/forecast` exposes
+only derived aggregates and generic scenario sentences with `iyear`/`country`
+overwritten, so no individual training incident is reconstructable from a response.
+
+Nonetheless the artifact now contains a sample of licensed GTD records, so it
+inherits the dataset's non-redistribution constraint (see the project licence in
+`pyproject.toml` and the "never raw GTD records" note in `api/main.py`). The
+practical invariant: **the model artifact must stay server-side and must never be
+shipped to any client, including the web thin client.** Existing artifacts must be
+retrained once to gain forecast support.
 
 ## Current boundary and next model
 
