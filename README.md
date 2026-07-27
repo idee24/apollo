@@ -14,7 +14,7 @@ This is a rebuild ("draft 2") of an MSc dissertation project. The full plan is i
 | **2** | FastAPI inference service + Docker | **done** — serves the trained model; `/health` · `/v1/models` · `/v1/predict` verified end-to-end |
 | **3** | Fairness audit + model card | **done** — subgroup audit + sensitive-field ablation; [model card](docs/model_card.md) filled |
 | **4** | Model C (RAG explanation) | **done** — `/v1/explain`, grounded template + optional LLM; never alters the number |
-| 5 | Honest scenario sweep | not started |
+| **5** | Honest scenario sweep | **done** — `/v1/scenario` date sweep, explicitly labelled non-forecast |
 | 6 | Thin client (Android/web) | not started |
 | 7+ | Model B (regional-month risk — research track) | not started |
 
@@ -100,6 +100,7 @@ Endpoints:
 | `GET /v1/models` | active version, test metrics, gate verdict, exposed feature columns |
 | `POST /v1/predict` | scenario (GTD integer codes) → calibrated `P(≥1 fatality)` + uncertainty band + disclaimer |
 | `POST /v1/explain` | same scenario → the calibrated number **plus** a grounded plain-language explanation with evidence (Model C) |
+| `POST /v1/scenario` | fixed scenario + year range → date-indexed probabilities, **explicitly labelled non-forecast** |
 
 Example:
 
@@ -115,6 +116,13 @@ The request schema uses `extra="forbid"`, so any banned outcome field (e.g. `nki
 rejected with **422** at the boundary. The uncertainty band is the min–max spread across the
 calibration folds — an honest indication of model disagreement, deliberately not a tight CI.
 Auth (`APOLLO_API_KEY`) and rate limiting (`APOLLO_RATE_LIMIT_PER_MIN`) are opt-in via env vars.
+
+**Scenario sweep (`/v1/scenario`).** The honest replacement for draft 1's fake "time series"
+(flaw #5): it varies **only the date** across one fixed incident and returns the conditional
+`P(≥1 fatality)` at each year (or month), holding everything else constant. Every response
+carries a prominent *SCENARIO SWEEP — NOT A FORECAST* disclaimer: it does not predict whether,
+where, or how often an attack occurs (that is Model B, not yet built). Sweeps are capped at 600
+points; `iyear`/`imonth` are rejected as inputs because they are the swept variables.
 
 **Model C — explanation (`/v1/explain`).** A retrieval-augmented explainer over Apollo's own
 docs (intended use, model card, prediction-time contract, feature glossary), ranked by TF-IDF —

@@ -13,12 +13,20 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException
 
 from api import explain as explain_service
+from api import scenario as scenario_service
 from api import service
 from api.knowledge import build_retriever
 from api.llm import get_llm
 from api.model_registry import load_model
-from api.schemas import ExplainResponse, PredictRequest, PredictResponse
+from api.schemas import (
+    ExplainResponse,
+    PredictRequest,
+    PredictResponse,
+    ScenarioRequest,
+    ScenarioResponse,
+)
 from api.security import rate_limit, require_api_key
+from engine.codes import describe_scenario
 
 
 @asynccontextmanager
@@ -94,3 +102,28 @@ def explain(req: PredictRequest) -> ExplainResponse:
     )
     out["model_version"] = m["version"]
     return ExplainResponse(**out)
+
+
+@app.post(
+    "/v1/scenario",
+    response_model=ScenarioResponse,
+    dependencies=[Depends(require_api_key), Depends(rate_limit)],
+)
+def scenario(req: ScenarioRequest) -> ScenarioResponse:
+    m = app.state.model
+    if not m:
+        raise HTTPException(status_code=503, detail="No model loaded. Train Model A first.")
+    try:
+        points = scenario_service.build_points(req.start_year, req.end_year, req.by, req.month)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    base = req.model_dump(exclude_none=True, exclude={"start_year", "end_year", "by", "month"})
+    swept = scenario_service.sweep(m["bundle"], base, points)
+    return ScenarioResponse(
+        model_version=m["version"],
+        by=req.by,
+        scenario=describe_scenario(base),
+        points=swept,
+        target=service.TARGET_DESCRIPTION,
+        disclaimer=scenario_service.DISCLAIMER,
+    )
